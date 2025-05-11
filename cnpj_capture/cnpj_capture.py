@@ -9,8 +9,9 @@ def get_months_and_years(url):
     months_and_years = []
     for link in soup.find_all('a'):
         href = link.get('href')
-        if '/dados/' in href and '-' in href:  # Verifique se o link aponta para um diretório de dados e contém um "-" (indicador de mês e ano)
-            months_and_years.append(href.split('/')[-1])
+        print(href)
+        if '-' in href:  # Verifique se o link aponta para um diretório de dados e contém um "-" (indicador de mês e ano)
+            months_and_years.append(href.split('/')[-2])
     
     return months_and_years
 
@@ -29,18 +30,20 @@ def download_files_from_directory(url, save_dir):
     links = []
     for link in soup.find_all('a'):
         href = link.get('href')
-        if href and '/dados/' in href:  # Verifique se o link aponta para um diretório de dados
+        if href and '.zip' in href:  # Verifique se o link aponta para um diretório de dados
             links.append(href)
     
     # Download dos arquivos
     for link in links:
-        file_url = f"https://arquivos.receitafederal.gov.br{link}"  # Construir a URL completa
+        file_url = url + '/' + link  # Construir a URL completa
         file_name = os.path.basename(file_url)  # Obter o nome do arquivo
         
         print(f"Downloading {file_name}")
         response = requests.get(file_url, stream=True)
+
+        caminho = 'C:/Users/evand/OneDrive/Documentos/ESTUDOS/ARTIGO-EVANDRO/web_scrap/cnpj_capture/data/'
         
-        with open(os.path.join('../data', file_name), 'wb') as f:  # Alterado para salvar os arquivos no diretório "data"
+        with open(caminho, 'wb') as f:  # Alterado para salvar os arquivos no diretório "data"
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
@@ -48,4 +51,4 @@ def download_files_from_directory(url, save_dir):
     print('Downloads completed')
 
 # Usar a função
-download_files('https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj', '\\jerusalem\media_library\repositories\web_scrap\cnpj_capture\data')
+download_files('https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj', '/data')
